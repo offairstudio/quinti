@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quinti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1f1f1f; --muted:#5f6368; --line:#dfe1e5; --hover:#f1f3f4;
+    --tile:#f1f3f4; --card:#ffffff; --shadow:0 1px 6px rgba(32,33,36,.28);
+    --blue:#4285F4; --red:#EA4335; --yellow:#FBBC05; --green:#34A853; --navy:#0F1B3D;
+    --chip:#e8f0fe; --chip-fg:#1a73e8;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --bg:#202124; --fg:#e8eaed; --muted:#9aa0a6; --line:#3c4043; --hover:#303134;
+    --tile:#303134; --card:#303134; --shadow:0 1px 6px rgba(0,0,0,.5);
+    --navy:#e8eaed; --chip:#394457; --chip-fg:#8ab4f8;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#202124; --fg:#e8eaed; --muted:#9aa0a6; --line:#3c4043; --hover:#303134;
+    --tile:#303134; --card:#303134; --shadow:0 1px 6px rgba(0,0,0,.5);
+    --navy:#e8eaed; --chip:#394457; --chip-fg:#8ab4f8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--fg);font-family:Heebo,Arial,sans-serif;font-size:14px}
+  button{font-family:inherit;cursor:pointer;background:none;border:0;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;font-size:13px;color:var(--fg)}
+  .topbar .links{display:flex;gap:18px;align-items:center}
+  .topbar .links a:hover{text-decoration:underline}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:600}
+  .apps{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+  .apps:hover{background:var(--hover)}
+
+  /* ---------- home ---------- */
+  #home{display:flex;flex-direction:column;align-items:center;padding:0 16px;min-height:calc(100vh - 120px)}
+  .logo{margin-top:6vh;margin-bottom:26px;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .logo svg{display:block}
+  .logo .word{font-weight:700;font-size:52px;letter-spacing:-1px;color:var(--navy);line-height:1;font-family:Heebo,Arial,sans-serif}
+
+  .search{width:100%;max-width:690px;position:relative}
+  .box{display:flex;align-items:center;gap:8px;height:48px;border:1px solid var(--line);border-radius:24px;padding:0 8px 0 8px;background:var(--bg)}
+  .box:hover,.box:focus-within,.box.open{box-shadow:var(--shadow);border-color:transparent}
+  .box.open{border-radius:24px 24px 0 0}
+  .box input{flex:1;border:0;outline:0;background:transparent;font:inherit;font-size:16px;color:var(--fg);min-width:0}
+  .box input::placeholder{color:var(--muted)}
+  .ico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--muted);flex:none}
+  .ico:hover{background:var(--hover)}
+  .ai{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:18px;background:var(--hover);font-size:13px;font-weight:500;flex:none}
+  .ai.on{background:var(--chip);color:var(--chip-fg)}
+
+  .drop{position:absolute;right:0;left:0;top:47px;background:var(--bg);border-radius:0 0 24px 24px;box-shadow:var(--shadow);padding:8px 0 12px;display:none;z-index:5}
+  .box.open + .drop{display:block}
+  .drop .sec{padding:4px 20px 6px;font-size:11px;color:var(--muted);letter-spacing:.3px}
+  .sug{display:flex;align-items:center;gap:12px;padding:6px 16px;cursor:pointer}
+  .sug:hover,.sug.active{background:var(--hover)}
+  .sug .q{flex:1;font-size:15px}
+  .sug .q b{font-weight:600}
+  .sug .who{font-size:12px;color:var(--muted);white-space:nowrap}
+  .sug svg{flex:none;color:var(--muted)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--chip);color:var(--chip-fg);white-space:nowrap}
+
+  .btns{display:flex;gap:12px;margin-top:22px}
+  .btns button{background:var(--tile);border:1px solid var(--tile);border-radius:4px;padding:0 16px;height:36px;font-size:14px;color:var(--fg)}
+  .btns button:hover{border-color:var(--line);box-shadow:0 1px 1px rgba(0,0,0,.1)}
+
+  .shortcuts{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;margin-top:38px;max-width:900px}
+  .sc{width:112px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 4px;border-radius:8px;position:relative}
+  .sc:hover{background:var(--hover)}
+  .sc .bubble{width:48px;height:48px;border-radius:50%;background:var(--tile);display:grid;place-items:center}
+  .sc .bubble .l{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+  .sc .name{font-size:13px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  .sc .more{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:50%;display:none;place-items:center;color:var(--muted)}
+  .sc:hover .more{display:grid}
+  .sc .more:hover{background:var(--line)}
+
+  .foot{margin-top:auto;padding:18px 0 8px;font-size:12px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+
+  /* ---------- results ---------- */
+  #results{display:none}
+  .rhead{display:flex;align-items:center;gap:24px;padding:16px 24px 0;border-bottom:1px solid var(--line)}
+  .rhead .mini{display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:14px}
+  .rhead .mini .word{font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.5px}
+  .rhead .search{margin-bottom:14px;max-width:690px}
+  .rhead .box{border-radius:24px}
+  .tabs{display:flex;gap:4px;padding:0 24px;margin-right:180px;border-bottom:1px solid var(--line)}
+  .tab{padding:10px 12px;font-size:13px;color:var(--muted);border-bottom:3px solid transparent;display:flex;gap:6px;align-items:center}
+  .tab.on{color:var(--chip-fg);border-color:var(--chip-fg);font-weight:500}
+  .tab:hover{color:var(--fg)}
+  .rbody{display:flex;gap:40px;padding:12px 24px 40px;margin-right:180px}
+  .main{flex:1;max-width:652px;min-width:0}
+  .side{width:360px;flex:none}
+  .count{font-size:13px;color:var(--muted);margin:6px 0 18px}
+  .r{margin-bottom:28px}
+  .r .src{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-bottom:4px}
+  .r .src .fav{width:26px;height:26px;border-radius:50%;background:var(--tile);display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+  .r h3{margin:0 0 4px;font-size:20px;font-weight:400;color:var(--chip-fg);cursor:pointer}
+  .r h3:hover{text-decoration:underline}
+  .r .ans{font-size:14px;line-height:1.55}
+  .r .ans b{font-weight:600}
+  .r .meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--muted)}
+  .r .meta a{color:var(--chip-fg)}
+  .kpi{display:inline-block;font-size:24px;font-weight:600;margin:6px 0 2px;color:var(--fg)}
+  .aiBox{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:26px;background:linear-gradient(135deg,rgba(66,133,244,.06),rgba(52,168,83,.06))}
+  .aiBox .t{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:8px}
+  .aiBox p{margin:0 0 8px;line-height:1.6}
+  .aiBox .refs{display:flex;gap:6px;flex-wrap:wrap}
+  .aiBox .refs span{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .panel h4{margin:0 0 10px;font-size:16px;font-weight:500}
+  .panel .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .panel .row:last-child{border:0}
+  .panel .row span:last-child{color:var(--muted)}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin:10px 0 4px}
+  .bars div{flex:1;background:var(--blue);border-radius:3px 3px 0 0;opacity:.85}
+  .bars div:last-child{background:var(--green)}
+  .empty{padding:40px 0;color:var(--muted)}
+  .pbi{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:16px;border:1px solid var(--line);font-size:13px;margin-top:8px}
+  .pbi:hover{background:var(--hover)}
+
+  @media (max-width:900px){
+    .rhead,.rbody,.tabs{margin-right:0}
+    .rbody{flex-direction:column;padding:12px 16px}
+    .side{width:100%}
+    .logo .word{font-size:42px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div id="home">
+  <div class="topbar" style="width:100%">
+    <div class="links">
+      <button class="apps" title="יישומים"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 8a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zM6 14a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zM6 20a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4z"/></svg></button>
+      <div class="avatar" title="עופר">ע</div>
+    </div>
+    <div class="links">
+      <a href="#">Power BI</a><a href="#">DWH</a><a href="#">שאלות אחרונות</a>
+      <button id="theme" title="מצב תצוגה" class="apps">◐</button>
+    </div>
+  </div>
+
+  <div class="logo" id="logoBig"></div>
+
+  <div class="search">
+    <div class="box" id="box">
+      <button class="ico" title="שאלה חדשה"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+      <input id="q" type="text" placeholder="שאלות ל-Quinti" autocomplete="off" spellcheck="false">
+      <button class="ico" title="חיפוש קולי"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11h-2z"/></svg></button>
+      <button class="ico" title="חיפוש לפי מסך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8V5a2 2 0 012-2h3M16 3h3a2 2 0 012 2v3M21 16v3a2 2 0 01-2 2h-3M8 21H5a2 2 0 01-2-2v-3"/><circle cx="12" cy="12" r="3.5"/></svg></button>
+      <button class="ai" id="aiToggle" title="מצב AI"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6L22.5 17.5l-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9zM4 15l.7 1.8L6.5 17.5l-1.8.7L4 20l-.7-1.8L1.5 17.5l1.8-.7z"/></svg>מצב AI</button>
+    </div>
+    <div class="drop" id="drop"></div>
+  </div>
+
+  <div class="btns">
+    <button id="goSearch">חיפוש Quinti</button>
+    <button id="lucky">אני מרגיש בר מזל</button>
+  </div>
+
+  <div class="shortcuts" id="shortcuts"></div>
+
+  <div class="foot">
+    <span>מחובר ל-DWH עירוני · עודכן היום 06:12</span>
+    <span>1,284 שאלות מנוהלות</span>
+    <span>פרטיות</span><span>תנאים</span><span>הגדרות</span>
+  </div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="results">
+  <div class="rhead">
+    <div class="mini" id="logoMini"></div>
+    <div class="search">
+      <div class="box" id="box2">
+        <input id="q2" type="text" autocomplete="off" spellcheck="false">
+        <button class="ico" id="clear2" title="נקה"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <button class="ico" title="חיפוש קולי"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11h-2z"/></svg></button>
+        <button class="ico" id="go2" title="חיפוש" style="color:var(--blue)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      </div>
+      <div class="drop" id="drop2"></div>
+    </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-f="all">הכל</div>
+    <div class="tab" data-f="מנכ&quot;ל">מנכ"ל</div>
+    <div class="tab" data-f="גזבר">גזבר</div>
+    <div class="tab" data-f="מנמ&quot;ר">מנמ"ר</div>
+    <div class="tab" data-f="ראש העיר">ראש העיר</div>
+    <div class="tab" data-f="pbi">דשבורדים</div>
+  </div>
+  <div class="rbody">
+    <div class="main" id="main"></div>
+    <div class="side" id="side"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- logo (inline SVG rebuild of the Quinti mark) ---------- */
+function logoSVG(size){
+  const s=size;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" aria-label="Quinti">
+    <g transform="translate(50 50)">
+      <path d="M0 -42 A42 42 0 0 1 42 0 L26 0 A26 26 0 0 0 0 -26 Z" fill="#EA4335"/>
+      <path d="M42 0 A42 42 0 0 1 12.3 40.2 L7.6 24.9 A26 26 0 0 0 26 0 Z" fill="#FBBC05"/>
+      <path d="M-42 0 A42 42 0 0 1 0 -42 L0 -26 A26 26 0 0 0 -26 0 Z" fill="#4285F4"/>
+      <path d="M-42 0 A42 42 0 0 0 12.3 40.2 L7.6 24.9 A26 26 0 0 1 -26 0 Z" fill="#34A853"/>
+      <path d="M6 24 L36 46 L30 14 Z" fill="#34A853"/>
+      <circle r="27" fill="#fff"/>
+      <path d="M2 22 L29 40 L25 12 Z" fill="#fff"/>
+      <circle cx="-13" cy="0" r="4.5" fill="#0F1B3D"/><circle cx="0" cy="0" r="4.5" fill="#0F1B3D"/><circle cx="13" cy="0" r="4.5" fill="#0F1B3D"/>
+    </g></svg>`;
+}
+document.getElementById('logoBig').innerHTML = logoSVG(120)+'<div class="word">Quinti</div>';
+document.getElementById('logoMini').innerHTML = logoSVG(34)+'<div class="word">Quinti</div>';
+
+/* ---------- mock DWH: executive questions ---------- */
+const ROLES={'מנכ"ל':'#4285F4','גזבר':'#34A853','מנמ"ר':'#EA4335','ראש העיר':'#FBBC05'};
+const DATA=[
+ {q:'מה אחוז גביית הארנונה מתחילת השנה?',who:'גזבר',date:'15.9.2026',kpi:'87.4%',ans:'גביית ארנונה שוטפת מתחילת 2026 עומדת על <b>87.4%</b> מהחיוב, לעומת 85.1% בתקופה המקבילה אשתקד. פיגורים בגבייה: ₪42.3M.',src:'dwh.fin.arnona_collection',etl:'etl_arnona_daily',pbi:'ארנונה וגבייה',tags:['ארנונה','גבייה','הכנסות'],trend:[72,75,79,82,84,86,87]},
+ {q:'כמה פניות 106 נפתחו החודש ומה זמן הטיפול הממוצע?',who:'מנכ"ל',date:'14.9.2026',kpi:'3,218',ans:'בספטמבר נפתחו <b>3,218</b> פניות מוקד 106. זמן טיפול ממוצע: <b>2.6 ימים</b>. 71% נסגרו בתוך SLA. הנושא המוביל: תברואה ופינוי אשפה (34%).',src:'dwh.ops.moked_106',etl:'etl_crm_hourly',pbi:'פניות ציבור 106',tags:['106','מוקד','שירות'],trend:[2900,3050,2980,3100,3300,3150,3218]},
+ {q:'מה ביצוע התקציב הרגיל מול תכנון לרבעון 3?',who:'גזבר',date:'12.9.2026',kpi:'94.2%',ans:'ביצוע הוצאות ברבעון 3 עומד על <b>94.2%</b> מהתכנון. חריגה במחלקת הנדסה (+6.1%) ותת-ביצוע ברווחה (−4.8%).',src:'dwh.fin.budget_vs_actual',etl:'etl_finance_nightly',pbi:'תקציב מול ביצוע',tags:['תקציב','ביצוע','הוצאות'],trend:[22,45,70,94]},
+ {q:'כמה תלמידים רשומים לשנת הלימודים תשפ"ז לפי שכבה?',who:'ראש העיר',date:'1.9.2026',kpi:'18,640',ans:'סה"כ <b>18,640</b> תלמידים רשומים. גני ילדים 3,910 · יסודי 8,120 · חט"ב 3,420 · תיכון 3,190. גידול של 2.3% לעומת תשפ"ו.',src:'dwh.edu.students_enrollment',etl:'etl_education_weekly',pbi:'חינוך',tags:['חינוך','תלמידים','רישום'],trend:[17200,17600,17900,18200,18640]},
+ {q:'מה זמינות המערכות הקריטיות בחודש האחרון?',who:'מנמ"ר',date:'10.9.2026',kpi:'99.82%',ans:'זמינות ממוצעת של 14 מערכות ליבה: <b>99.82%</b>. תקלה אחת מהותית במערכת הגבייה (2 שעות ו-40 דק׳) ב-3.9.',src:'dwh.it.system_uptime',etl:'etl_monitoring_15m',pbi:'מערכות מידע',tags:['IT','זמינות','תקלות'],trend:[99.6,99.9,99.7,99.82]},
+ {q:'כמה היתרי בנייה הונפקו השנה ומה זמן הטיפול הממוצע?',who:'מנכ"ל',date:'8.9.2026',kpi:'412',ans:'הונפקו <b>412</b> היתרים מתחילת השנה. זמן טיפול ממוצע <b>118 ימים</b>, ירידה של 11 ימים לעומת 2025.',src:'dwh.eng.building_permits',etl:'etl_engineering_daily',pbi:'הנדסה ורישוי',tags:['הנדסה','היתרים','רישוי'],trend:[30,62,105,150,210,260,310,360,412]},
+ {q:'מה יתרת המזומנים ומסגרת האשראי הפנויה?',who:'גזבר',date:'16.9.2026',kpi:'₪128M',ans:'יתרת מזומנים בבנקים: <b>₪128M</b>. מסגרת אשראי מנוצלת: 18% מתוך ₪60M. תחזית תזרים ל-90 יום חיובית.',src:'dwh.fin.cash_position',etl:'etl_bank_daily',pbi:'תזרים מזומנים',tags:['תזרים','מזומנים','אשראי'],trend:[110,118,121,115,124,128]},
+ {q:'כמה עובדים יש ברשות ומה שיעור התחלופה?',who:'מנכ"ל',date:'5.9.2026',kpi:'2,146',ans:'<b>2,146</b> עובדים (1,780 משרות מלאות). תחלופה שנתית 7.9%. 61 משרות פתוחות, מתוכן 14 מעל 90 יום.',src:'dwh.hr.headcount',etl:'etl_hr_weekly',pbi:'כוח אדם',tags:['כוח אדם','עובדים','תחלופה'],trend:[2080,2095,2110,2130,2146]},
+ {q:'מה מספר מקבלי שירותי הרווחה ומה התקציב לנפש?',who:'ראש העיר',date:'2.9.2026',kpi:'9,730',ans:'<b>9,730</b> מקבלי שירות פעילים. תקציב רווחה לנפש: ₪6,120. 38% קשישים, 27% ילדים ונוער בסיכון.',src:'dwh.welfare.cases',etl:'etl_welfare_weekly',pbi:'רווחה',tags:['רווחה','תקציב'],trend:[9400,9520,9600,9730]},
+ {q:'כמה אירועי סייבר זוהו ברבעון ומה רמת הסיכון?',who:'מנמ"ר',date:'11.9.2026',kpi:'27',ans:'זוהו <b>27</b> אירועים ברבעון 3, 3 ברמה גבוהה. כולם נחסמו. 92% מהעובדים סיימו הדרכת מודעות.',src:'dwh.it.security_events',etl:'etl_siem_hourly',pbi:'מערכות מידע',tags:['סייבר','אבטחה','IT'],trend:[41,35,27]},
+ {q:'מה שיעור מחזור הפסולת ועלות פינוי לטון?',who:'מנכ"ל',date:'7.9.2026',kpi:'31%',ans:'שיעור מחזור: <b>31%</b> (יעד 35%). עלות פינוי ממוצעת: ₪412 לטון. 14,200 טון פונו החודש.',src:'dwh.env.waste',etl:'etl_sanitation_daily',pbi:'תברואה ואיכות סביבה',tags:['פסולת','מחזור','תברואה'],trend:[24,26,28,29,31]},
+ {q:'מה עלות פרויקטי המחשוב מול התקציב המאושר?',who:'מנמ"ר',date:'9.9.2026',kpi:'₪18.4M',ans:'בוצעו <b>₪18.4M</b> מתוך ₪24M מאושרים (77%). 3 פרויקטים בסיכון לוחות זמנים: CRM, GIS, ארכיב דיגיטלי.',src:'dwh.it.projects',etl:'etl_pmo_daily',pbi:'מערכות מידע',tags:['IT','פרויקטים','תקציב'],trend:[4,8,12,15,18.4]},
+];
+
+const SHORTCUTS=[
+ {n:'ארנונה וגבייה',c:'#34A853',l:'₪'},{n:'תקציב מול ביצוע',c:'#4285F4',l:'תק'},{n:'פניות ציבור 106',c:'#EA4335',l:'106'},
+ {n:'חינוך',c:'#FBBC05',l:'חנ'},{n:'רווחה',c:'#8E24AA',l:'רו'},{n:'כוח אדם',c:'#00897B',l:'כא'},
+ {n:'הנדסה ורישוי',c:'#F4511E',l:'הנ'},{n:'מערכות מידע',c:'#3949AB',l:'IT'},{n:'תזרים מזומנים',c:'#6D4C41',l:'תז'},
+];
+
+/* ---------- shortcuts ---------- */
+const sc=document.getElementById('shortcuts');
+sc.innerHTML = SHORTCUTS.map(s=>`
+  <a class="sc" href="#" data-pbi="${s.n}" title="פתח דשבורד ${s.n} ב-Power BI">
+    <span class="more" title="ערוך">⋮</span>
+    <div class="bubble"><div class="l" style="background:${s.c}">${s.l}</div></div>
+    <div class="name">${s.n}</div>
+  </a>`).join('') + `
+  <a class="sc" href="#" id="addSc"><div class="bubble"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><div class="name">הוספת קיצור דרך</div></a>`;
+sc.addEventListener('click',e=>{
+  const a=e.target.closest('.sc'); if(!a) return; e.preventDefault();
+  if(a.id==='addSc'){ const n=prompt('שם הדשבורד ב-Power BI:'); if(n){SHORTCUTS.push({n,c:'#5f6368',l:n.slice(0,2)}); location.reload();} return; }
+  toast(`פותח את "${a.dataset.pbi}" ב-Power BI…`);
+});
+
+/* ---------- search helpers ---------- */
+const norm=s=>s.replace(/["׳״']/g,'').toLowerCase();
+function match(item,q){
+  if(!q) return true;
+  const n=norm(q).split(/\s+/).filter(Boolean);
+  const hay=norm(item.q+' '+item.ans.replace(/<[^>]+>/g,'')+' '+item.who+' '+item.tags.join(' ')+' '+item.pbi);
+  return n.every(t=>hay.includes(t));
+}
+function hl(text,q){
+  if(!q) return text;
+  const terms=q.trim().split(/\s+/).filter(Boolean).map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  return terms.length?text.replace(new RegExp('('+terms.join('|')+')','gi'),'<b>$1</b>'):text;
+}
+
+/* ---------- autocomplete (shared by both boxes) ---------- */
+function bindAutocomplete(input,box,drop,onSubmit){
+  let idx=-1, items=[];
+  function render(){
+    const q=input.value.trim();
+    items=DATA.filter(i=>match(i,q)).slice(0,8);
+    if(!items.length){box.classList.remove('open');return;}
+    drop.innerHTML=`<div class="sec">${q?'שאלות תואמות מה-DWH':'שאלות אחרונות של המנהלים'}</div>`+
+      items.map((it,i)=>`<div class="sug ${i===idx?'active':''}" data-i="${i}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${q?'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'}</svg>
+        <span class="q">${hl(it.q,q)}</span>
+        <span class="pill" style="background:${ROLES[it.who]}22;color:${ROLES[it.who]}">${it.who}</span>
+        <span class="who">${it.date}</span></div>`).join('');
+    box.classList.add('open');
+  }
+  input.addEventListener('focus',()=>{idx=-1;render();});
+  input.addEventListener('input',()=>{idx=-1;render();});
+  input.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){idx=Math.min(idx+1,items.length-1);render();e.preventDefault();}
+    else if(e.key==='ArrowUp'){idx=Math.max(idx-1,-1);render();e.preventDefault();}
+    else if(e.key==='Enter'){ if(idx>=0) input.value=items[idx].q; box.classList.remove('open'); onSubmit(input.value.trim()); }
+    else if(e.key==='Escape'){box.classList.remove('open');}
+  });
+  drop.addEventListener('mousedown',e=>{
+    const s=e.target.closest('.sug'); if(!s) return;
+    input.value=items[+s.dataset.i].q; box.classList.remove('open'); onSubmit(input.value.trim());
+  });
+  document.addEventListener('click',e=>{ if(!box.contains(e.target)&&!drop.contains(e.target)) box.classList.remove('open'); });
+}
+
+/* ---------- results view ---------- */
+let filter='all', aiMode=false;
+const fmt=n=>typeof n==='number'?n.toLocaleString('he-IL'):n;
+function showResults(q){
+  document.getElementById('home').style.display='none';
+  document.getElementById('results').style.display='block';
+  document.getElementById('q2').value=q;
+  history.replaceState(null,'','#q='+encodeURIComponent(q));
+  document.title=(q?q+' - ':'')+'Quinti';
+  renderResults(q);
+}
+function renderResults(q){
+  const t0=performance.now();
+  let hits=DATA.filter(i=>match(i,q));
+  if(filter!=='all'&&filter!=='pbi') hits=hits.filter(i=>i.who===filter);
+  const main=document.getElementById('main'), side=document.getElementById('side');
+  const ms=((performance.now()-t0)/1000+0.18).toFixed(2);
+
+  if(filter==='pbi'){
+    const dash=[...new Set(hits.map(h=>h.pbi))];
+    main.innerHTML=`<div class="count">${dash.length} דשבורדים רלוונטיים</div>`+dash.map(d=>{
+      const s=SHORTCUTS.find(x=>x.n===d)||{c:'#5f6368',l:d.slice(0,2)};
+      return `<div class="r"><div class="src"><span class="fav" style="background:${s.c}">${s.l}</span>Power BI · דשבורד</div>
+        <h3 onclick="toast('פותח את ${d} ב-Power BI…')">${d}</h3>
+        <div class="ans">${hits.filter(h=>h.pbi===d).length} שאלות מנהלים נענו ממקור זה.</div></div>`;}).join('');
+    side.innerHTML=''; return;
+  }
+
+  main.innerHTML=`<div class="count">כ-${hits.length} תוצאות (${ms} שניות)</div>`+
+   (aiMode&&hits.length?`<div class="aiBox"><div class="t">✦ סקירת AI</div>
+      <p>נמצאו ${hits.length} שאלות שנשאלו על ידי ${[...new Set(hits.map(h=>h.who))].join(', ')} בנוגע ל"${q||'הנושאים האחרונים'}". ${hits[0].ans.replace(/<[^>]+>/g,'')}</p>
+      <div class="refs">${hits.slice(0,4).map(h=>`<span>${h.src}</span>`).join('')}</div></div>`:'')+
+   (hits.length?hits.map(h=>`<div class="r">
+      <div class="src"><span class="fav" style="background:${ROLES[h.who]}">${h.who[0]}</span><span>${h.who} · ${h.date}</span><span>· ${h.src}</span></div>
+      <h3>${hl(h.q,q)}</h3>
+      <div class="kpi" dir="ltr">${h.kpi}</div>
+      <div class="ans">${h.ans}</div>
+      <div class="meta"><span>ETL: ${h.etl}</span><a href="#" onclick="toast('פותח את ${h.pbi} ב-Power BI…');return false">📊 ${h.pbi}</a>${h.tags.map(t=>`<a href="#" onclick="document.getElementById('q2').value='${t}';showResults('${t}');return false">#${t}</a>`).join('')}</div>
+    </div>`).join(''):`<div class="empty">לא נמצאו שאלות תואמות ל-"${q}".<br>נסה מונח אחר, או שאל שאלה חדשה והיא תנותב למנמ"ר.</div>`);
+
+  const top=hits[0];
+  side.innerHTML= top?`<div class="panel">
+      <h4>${top.pbi}</h4>
+      <div style="font-size:12px;color:var(--muted)">מגמה · ${top.src}</div>
+      <div class="bars">${top.trend.map(v=>`<div style="height:${Math.max(8,v/Math.max(...top.trend)*100)}%" title="${fmt(v)}"></div>`).join('')}</div>
+      <div class="row"><span>ערך אחרון</span><span dir="ltr">${top.kpi}</span></div>
+      <div class="row"><span>נשאל על ידי</span><span>${top.who}</span></div>
+      <div class="row"><span>עודכן</span><span>${top.date}</span></div>
+      <div class="row"><span>ETL</span><span>${top.etl}</span></div>
+      <a class="pbi" href="#" onclick="toast('פותח את ${top.pbi} ב-Power BI…');return false">📊 פתח ב-Power BI</a>
+    </div>
+    <div class="panel"><h4>שאלות קשורות</h4>${DATA.filter(d=>d!==top&&d.pbi===top.pbi||d.tags.some(t=>top.tags.includes(t))).filter(d=>d!==top).slice(0,4).map(d=>`<div class="row" style="cursor:pointer" onclick="document.getElementById('q2').value='${d.q}';showResults('${d.q}')"><span>${d.q}</span><span>${d.who}</span></div>`).join('')||'<div class="row"><span>אין</span></div>'}</div>`:'';
+}
+
+document.getElementById('tabs').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  filter=t.dataset.f; renderResults(document.getElementById('q2').value.trim());
+});
+document.getElementById('aiToggle').addEventListener('click',function(){aiMode=!aiMode;this.classList.toggle('on',aiMode);});
+document.getElementById('goSearch').addEventListener('click',()=>showResults(document.getElementById('q').value.trim()));
+document.getElementById('lucky').addEventListener('click',()=>{const r=DATA[Math.floor(Math.random()*DATA.length)];showResults(r.q);});
+document.getElementById('go2').addEventListener('click',()=>renderResults(document.getElementById('q2').value.trim()));
+document.getElementById('clear2').addEventListener('click',()=>{document.getElementById('q2').value='';document.getElementById('q2').focus();});
+document.getElementById('logoMini').addEventListener('click',()=>{document.getElementById('results').style.display='none';document.getElementById('home').style.display='flex';document.getElementById('q').value='';history.replaceState(null,'','#');document.title='Quinti';});
+document.getElementById('theme').addEventListener('click',()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';});
+
+bindAutocomplete(document.getElementById('q'),document.getElementById('box'),document.getElementById('drop'),showResults);
+bindAutocomplete(document.getElementById('q2'),document.getElementById('box2'),document.getElementById('drop2'),q=>showResults(q));
+
+function toast(m){
+  let t=document.getElementById('toast'); if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:99;box-shadow:0 2px 8px rgba(0,0,0,.3)';document.body.appendChild(t);}
+  t.textContent=m; t.style.opacity=1; clearTimeout(t._h); t._h=setTimeout(()=>t.style.opacity=0,2200);
+}
+// deep link
+const m=location.hash.match(/#q=(.*)/); if(m){ showResults(decodeURIComponent(m[1])); }
+</script>
+</body>
+</html>
